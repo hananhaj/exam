@@ -1,0 +1,1139 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Clock, AlertTriangle, CheckCircle, Save, LogOut, FileText, User, Lock, ChevronLeft, ChevronRight, BarChart, Download, Bot } from 'lucide-react';
+
+// --- התוכן של הבחינה ---
+const EXAM_TEXT = [
+  { id: 'A', text: 'בעשורים האחרונים הפכה העיר המודרנית למקום שבו חיים מיליוני אנשים בצפיפות גבוהה, ובו מתקיימים בו־זמנית תעשייה, מסחר, תרבות ופנאי. רשויות רבות מדגישות את חשיבות איכות החיים של התושבים, אך בפועל נוצרת לעיתים אחידות חיצונית בלבד – אותם קניונים, אותן שכונות ואותו מבנה רחובות – בלי תשומת לב מספקת לצרכים הייחודיים של כל קהילה. במקרים רבים פועלות בעיר רשויות מקומיות שונות, שלכל אחת מהן תקציב, סדרי עדיפויות ויכולת אכיפה משלה, ולכן לא פעם מתעוררות מחלוקות בין תושבים לבין הרשות באשר לאחריות על מיפגעי רעש, זיהום או עומסי תנועה.' },
+  { id: 'B', text: 'אחד הנושאים המרכזיים בדיון הציבורי הוא השאלה עד כמה העיר מצליחה ליצור תנאים התומכים בחֹסֶן נפשי של התושבים. מחקרים מצביעים על כך שחיים בסביבה רועשת, עמוסת תנועה ותעשייה, עלולים להגביר תחושות של לחץ ואף להוביל לדיכאון בקרב קבוצות מסוימות. תושבים אלה נחשבים לעיתים קבוצת סיכון, במיוחד כאשר הם נתקלים שוב ושוב בבעיות חוזרות – כמו כבישים מסוכנים, משאבת מים מקולקלת בבניין או דליפה חוזרת במערכת הביוב – בלי לקבל פתרון יעיל. במצבים כאלה מתפתחת אצל רבים תחושה של מודעות גבוהה לבעיה, אך גם ייאוש, והם מרגישים שהעיר מתעלמת מן הצרכים שלהם.' },
+  { id: 'C', text: 'במטרה להתמודד עם בעיות אלו, קובעת הרשות המקומית תקנות שונות שנועדו לצמצם נזק ולהסדיר את החיים המשותפים. תקנות אלה כוללות, למשל, הגבלת שעות המנוחה שבהן אסור להפעיל מכשירים רועשים, או קביעה של קנסות כבדים לבעלי עסקים שמפרים שוב ושוב את כללי הבטיחות. לעיתים מוחלט אף על מצב חירום נקודתי בשכונה מסוימת, בעקבות הסלמה ברמת הרעש או הזיהום. אלא שלא תמיד התקנות מיושמות באופן אפקטיבי; חלק מן התושבים טוענים שמנגנון הפיקוח מסורבל, שהעונשים במקרים רבים אינם עוברים ממינימום מסוים, ושהרשות נוטה לגלות סבלנות מופרזת כלפי גורמים פוגעניים.' },
+  { id: 'D', text: 'העיר המודרנית מפעילה מנגנון אכיפה מורכב, שבמסגרתו פועלים פקחים, מהנדסים ויועצים משפטיים. מצד אחד, הרשות חייבת לאכוף את התקנות, לטפל בכל תלונה של תושב ולדאוג שלא יתפתחו אירועים קיצוניים. מצד אחר, ישנו חשש שהקצנה במדיניות האכיפה – למשל הטלת מאסר מהיר על בעלי עסקים או עימותים פיזיים עם תושבים – תוביל דווקא להסלמה ביחסים ביניהם ובין הרשות. כדי להימנע מכך מנסים ברשויות רבות ליישם מדיניות הדרגתית: תחילה משלחים אזהרה, אחר כך מוטל קנס, ורק במקרה של הפרה חוזרת ונשנית שוקלים צעדים חמורים יותר. למרבה הצער, לא כל הצדדים מוכנים לשתף פעולה, ולעיתים מתפתחים סכסוכים ארוכים.' },
+  { id: 'E', text: 'בעידן הרשתות החברתיות מתפתחת תופעה חדשה: תושבים משתמשים בפלטפורמות מקוונות כדי לפרסם ביקורת על הרשות המקומית, לחשוף הדלפה של מסמכים פנימיים ולשתף סרטונים המתעדים סחרחורת של רעש וזיהום באזורים מסוימים. סרטונים אלו עשויים להרתיח את הציבור וליצור רושם שהמצב בעיר בלתי נסבל, גם אם בפועל מדובר במספר מצומצם של מיפגעים. במקרים מסוימים, עצם פרסום הסרטונים תורם להקצנה של עמדות: חלק מן התושבים מגבשים דעה קדומה שלפיה כל נציג ציבור מושחת או אדיש, ואחרים מתעלמים מכל שיפור שחל בשטח. יחד עם זאת, הודות ל־לחץ הציבורי ברשת, רשויות מסוימות החלו לפעול בשקיפות גבוהה יותר ולפרסם מידע ברור לגבי התלונות שהתקבלו והטיפול בהן.' },
+  { id: 'F', text: 'הדיון הציבורי אינו מתמקד רק בנתונים, אלא גם בשפה שבה משתמשים הצדדים. כך, למשל, יש הבדל בין תיאור מפעל כגורם בוטה ל“זיהום אוויר מסוים”, לבין הצגתו כ“סכנה בריאותית חמורה לתושבי האזור”. בחירה במילים חריפות עשויה להיתפס כהגזמה או כהפלגה, אך לעיתים מילים אלו נועדו להחמיר בכוונה את התיאור כדי לעורר את הציבור לפעולה. יש תושבים הסבורים כי כדאי להימנע מהקצנה בשיח ולהעדיף טענה עניינית, מבוססת נתונים. אחרים מאמינים שבלי שפה חריפה לא יקשיבו להם. לפיכך, השאלה כיצד לדבר על הבעיות בעיר הופכת לחלק בלתי נפרד מן הוויכוח הציבורי על איכות החיים.' }
+];
+
+const ADDED_TEXT = 'בעיר מסוימת הותקן בשנים האחרונות מנגנון מדידה חדש, הבוחן את רמת הרעש ברחובות מרכזיים במשך כל שעות היממה. הנתונים הראו כי בשל עבודות תעשייה ליליות, תחבורה כבדה ומקומות בילוי, רמת הרעש בשכונות סמוכות עלתה בהרבה מעל הסף שנקבע בתקנות. בעקבות זאת הכריזה הרשות המקומית על מצב חירום זמני בשתי שכונות, הגבילה את פעילות העסקים בשעות מאוחרות והטילה קנסות על מי שהמשיך להפעיל ציוד רועש. חלק מן התושבים טענו שהצעדים הללו פוגעים בחופש העיסוק, ואחרים טענו שהרשות נמנעה במשך שנים מלטפל בבעיה, ולכן הצעדים כעת הם רק מינימום נדרש לשיפור המצב.';
+
+// --- רכיבים כלליים ---
+const Modal = ({ isOpen, title, message, onClose, type = 'warning' }) => {
+  if (!isOpen) return null;
+  const isWarning = type === 'warning';
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" dir="rtl">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+        <div className={`flex items-center gap-3 mb-4 ${isWarning ? 'text-red-600' : 'text-blue-600'}`}>
+          {isWarning ? <AlertTriangle size={32} /> : <CheckCircle size={32} />}
+          <h2 className="text-2xl font-bold">{title}</h2>
+        </div>
+        <p className="text-slate-700 text-lg mb-8 leading-relaxed">{message}</p>
+        <div className="flex justify-end">
+          <button onClick={onClose} className={`px-6 py-2 rounded-lg text-white font-medium ${isWarning ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}>
+            הבנתי
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- האפליקציה המרכזית ---
+export default function App() {
+  const [currentUser, setCurrentUser] = useState(null); // { role: 'student'|'teacher', name, id, orgCode }
+  const [submissions, setSubmissions] = useState([]); // Mock Database
+
+  if (!currentUser) {
+    return <LoginScreen onLogin={setCurrentUser} />;
+  }
+
+  if (currentUser.role === 'teacher') {
+    return <TeacherApp user={currentUser} onLogout={() => setCurrentUser(null)} submissions={submissions} setSubmissions={setSubmissions} />;
+  }
+
+  return <StudentApp user={currentUser} onLogout={() => setCurrentUser(null)} onSubmit={(testData) => {
+    setSubmissions([...submissions, { ...testData, status: 'submitted', graded: false }]);
+    setCurrentUser(null);
+  }} />;
+}
+
+// --- מסך כניסה ---
+function LoginScreen({ onLogin }) {
+  const [tab, setTab] = useState('student');
+  const [formData, setFormData] = useState({ id: '', name: '', orgCode: '', extraTime: false, password: '' });
+  const [error, setError] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (tab === 'teacher') {
+      if (formData.password === '210286' && formData.orgCode) {
+        onLogin({ role: 'teacher', orgCode: formData.orgCode, name: 'מורה' });
+      } else {
+        setError('סיסמה או סמל מוסד שגויים');
+      }
+    } else {
+      if (formData.id && formData.name && formData.orgCode) {
+        onLogin({ role: 'student', ...formData });
+      } else {
+        setError('נא למלא את כל השדות');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans" dir="rtl">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        <div className="bg-blue-700 p-6 text-center text-white">
+          <h1 className="text-2xl font-bold mb-2">בית ספר מקיף כאוכב אבו אלהיא</h1>
+          <p className="text-blue-100">מערכת בחינות מקוונת</p>
+        </div>
+        
+        <div className="flex border-b border-slate-200">
+          <button className={`flex-1 py-4 text-center font-medium transition-colors ${tab === 'student' ? 'text-blue-700 border-b-2 border-blue-700 bg-blue-50/50' : 'text-slate-500 hover:text-slate-700'}`} onClick={() => {setTab('student'); setError('');}}>
+            <User className="inline-block ml-2 w-5 h-5" /> כניסת תלמידים
+          </button>
+          <button className={`flex-1 py-4 text-center font-medium transition-colors ${tab === 'teacher' ? 'text-blue-700 border-b-2 border-blue-700 bg-blue-50/50' : 'text-slate-500 hover:text-slate-700'}`} onClick={() => {setTab('teacher'); setError('');}}>
+            <Lock className="inline-block ml-2 w-5 h-5" /> כניסת צוות
+          </button>
+        </div>
+
+        <form onSubmit={handleLogin} className="p-6 space-y-5">
+          {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">{error}</div>}
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">סמל מוסד</label>
+            <input type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none" value={formData.orgCode} onChange={e => setFormData({...formData, orgCode: e.target.value})} placeholder="הכנס סמל מוסד" required />
+          </div>
+
+          {tab === 'student' ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">תעודת זהות</label>
+                <input type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={formData.id} onChange={e => setFormData({...formData, id: e.target.value})} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">שם מלא</label>
+                <input type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+              </div>
+              <div className="flex items-center gap-2 pt-2">
+                <input type="checkbox" id="extraTime" className="w-4 h-4 text-blue-600 rounded" checked={formData.extraTime} onChange={e => setFormData({...formData, extraTime: e.target.checked})} />
+                <label htmlFor="extraTime" className="text-sm font-medium text-slate-700">האם אתה זכאי לתוספת זמן?</label>
+              </div>
+            </>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">סיסמת מורה</label>
+              <input type="password" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} required />
+            </div>
+          )}
+
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors mt-4">
+            היכנס למערכת
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// --- ממשק תלמיד ---
+function StudentApp({ user, onLogout, onSubmit }) {
+  const [currentScreen, setCurrentScreen] = useState('instructions'); // instructions, part1, part2, part3, summary
+  const [answers, setAnswers] = useState({});
+  const [timeLeft, setTimeLeft] = useState(user.extraTime ? 10350 : 9000); // 150 mins or 172.5 mins (in seconds)
+  const [isSaved, setIsSaved] = useState(true);
+  const [modalContent, setModalContent] = useState(null);
+  const [cheatLogs, setCheatLogs] = useState([]);
+  
+  const containerRef = useRef(null);
+
+  // Auto Save Simulation
+  useEffect(() => {
+    setIsSaved(false);
+    const timer = setTimeout(() => setIsSaved(true), 1000);
+    return () => clearTimeout(timer);
+  }, [answers]);
+
+  // Timer
+  useEffect(() => {
+    if (currentScreen === 'instructions') return;
+    const timerId = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerId);
+          handleFinalSubmit(); // Auto submit when time is up
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [currentScreen]);
+
+  // Anti-Cheat (Visibility + Fullscreen)
+  useEffect(() => {
+    if (currentScreen === 'instructions') return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        logCheat('מעבר כרטיסייה / יציאה מהחלון');
+        setModalContent({ title: 'אזהרת מערכת!', message: 'זוהתה יציאה ממסך המבחן. הפעולה נרשמה במערכת.' });
+      }
+    };
+
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        logCheat('יציאה ממסך מלא');
+        setModalContent({ title: 'שים לב!', message: 'עליך להישאר במסך מלא במהלך כל הבחינה.' });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
+    // Prevent default copy/paste globally except in our specific text areas
+    const blockCopyPaste = (e) => {
+        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('.selectable-text')) {
+             e.preventDefault();
+        }
+    };
+    document.addEventListener('copy', blockCopyPaste);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('copy', blockCopyPaste);
+    };
+  }, [currentScreen]);
+
+  const logCheat = (action) => {
+    setCheatLogs(prev => [...prev, { time: new Date().toISOString(), action }]);
+  };
+
+  const startExam = () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(err => console.log(err));
+    }
+    setCurrentScreen('part1');
+  };
+
+  const formatTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const updateAnswer = (key, value) => {
+    setAnswers(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleFinalSubmit = () => {
+    if(document.fullscreenElement) {
+       document.exitFullscreen().catch(err=>console.log(err));
+    }
+    onSubmit({
+      student: user,
+      answers,
+      cheatLogs,
+      submittedAt: new Date().toISOString()
+    });
+    setModalContent({ title: 'המבחן הוגש בהצלחה', message: 'תשובותיך נקלטו במערכת. אין אפשרות לצפות בציונים או בתשובות הנכונות בשלב זה.', type: 'success' });
+  };
+
+  if (currentScreen === 'instructions') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans" dir="rtl">
+        <div className="max-w-3xl w-full bg-white rounded-xl shadow-lg p-8 border border-slate-200">
+          <div className="text-center mb-8 border-b pb-6">
+             <h1 className="text-3xl font-bold text-slate-800 mb-2">עברית: הבנה, הבעה ולשון</h1>
+             <h2 className="text-xl text-slate-600 mb-1">לבתי ספר ערביים</h2>
+             <h3 className="text-lg font-medium text-blue-700">בית ספר מקיף כאוכב אבו אלהיא</h3>
+          </div>
+          
+          <div className="prose prose-slate max-w-none space-y-4 text-slate-700">
+            <p><strong>הוראות</strong><br/>משך הבחינה: שעתיים וחצי {user.extraTime && '(+15% תוספת זמן)'}.</p>
+            <p><strong>א. מבנה השאלון ומפתח ההערכה:</strong> בשאלון זה שלושה פרקים.</p>
+            <ul className="list-disc pr-6 space-y-1">
+                <li>פרק ראשון - הבנת הנקרא (50 נקודות)</li>
+                <li>פרק שני - חיבור (25 נקודות)</li>
+                <li>פרק שלישי - לשון (25 נקודות)</li>
+            </ul>
+            <p><strong>סה"כ: 100 נקודות</strong></p>
+            <p><strong>ב. חומר עזר מותר בשימוש:</strong> אין.</p>
+            <p><strong>ג. הוראות מיוחדות:</strong></p>
+            <ul className="list-decimal pr-6 space-y-1">
+                <li>יש לענות על כל השאלות במקומות המיועדים לכך.</li>
+                <li>בכתיבת החיבור יש להתרכז בנושא, להימנע מהקדמות ארוכות, מסטיות מן הנושא ומחזרות על רעיונות.</li>
+                <li>יש לשים לב לכתב, לכתיב, לפיסוק ולכללי הדקדוק.</li>
+            </ul>
+            <div className="mt-6 p-4 bg-blue-50 border-r-4 border-blue-600 rounded-l-lg">
+                <p className="font-medium text-blue-800">השאלות בשאלון זה מנוסחות בלשון רבים, אף על פי כן על כל תלמידה וכל תלמיד להשיב עליהן באופן אישי.</p>
+                <p className="mt-2 text-sm text-blue-600">הכינה המורה חנאן חאג' מוחמד</p>
+            </div>
+          </div>
+          
+          <div className="mt-10 flex justify-center">
+             <button onClick={startExam} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-transform hover:scale-105 text-lg flex items-center gap-2">
+                 התחל מבחן עכשיו
+                 <ChevronLeft />
+             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex flex-col bg-slate-100 font-sans" dir="rtl" ref={containerRef}>
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b px-6 py-3 flex justify-between items-center z-10 shrink-0">
+        <div className="flex items-center gap-4">
+            <div className="font-bold text-lg text-slate-800">מבחן בעברית</div>
+            <div className="hidden md:flex items-center gap-2 text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                <User size={16} /> {user.name} ({user.id})
+            </div>
+        </div>
+        <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+                {isSaved ? <span className="text-green-600 flex items-center gap-1 text-sm"><CheckCircle size={14}/> נשמר</span> : <span className="text-slate-400 flex items-center gap-1 text-sm"><Save size={14}/> שומר...</span>}
+            </div>
+            <div className={`font-mono text-xl font-bold flex items-center gap-2 px-4 py-1 rounded-lg ${timeLeft < 300 ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-slate-100 text-slate-800'}`}>
+                <Clock size={20} />
+                {formatTime(timeLeft)}
+            </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-hidden relative">
+          {currentScreen === 'part1' && <Part1 answers={answers} updateAnswer={updateAnswer} />}
+          {currentScreen === 'part2' && <Part2 answers={answers} updateAnswer={updateAnswer} />}
+          {currentScreen === 'part3' && <Part3 answers={answers} updateAnswer={updateAnswer} />}
+          {currentScreen === 'summary' && <SummaryScreen answers={answers} onSubmit={handleFinalSubmit} />}
+      </main>
+
+      {/* Footer Navigation */}
+      <footer className="bg-white border-t p-4 flex justify-between items-center shrink-0">
+          <div className="flex gap-2">
+              <button disabled={currentScreen === 'part1'} onClick={() => setCurrentScreen(currentScreen === 'summary' ? 'part3' : currentScreen === 'part3' ? 'part2' : 'part1')} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg flex items-center gap-2 disabled:opacity-50 transition-colors">
+                  <ChevronRight size={18} /> פרק קודם
+              </button>
+          </div>
+          
+          <div className="flex gap-2 overflow-x-auto px-4">
+             {['part1', 'part2', 'part3', 'summary'].map((step, idx) => (
+                 <button key={step} onClick={() => setCurrentScreen(step)} className={`w-3 h-3 rounded-full transition-all ${currentScreen === step ? 'bg-blue-600 w-8' : 'bg-slate-300 hover:bg-slate-400'}`} aria-label={`עבור לפרק ${idx + 1}`} />
+             ))}
+          </div>
+
+          <div className="flex gap-2">
+              {currentScreen !== 'summary' ? (
+                <button onClick={() => setCurrentScreen(currentScreen === 'part1' ? 'part2' : currentScreen === 'part2' ? 'part3' : 'summary')} className="px-6 py-2 bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 rounded-lg flex items-center gap-2 transition-colors">
+                    פרק הבא <ChevronLeft size={18} />
+                </button>
+              ) : (
+                <button onClick={handleFinalSubmit} className="px-8 py-2 bg-green-600 text-white font-bold hover:bg-green-700 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
+                    <CheckCircle size={18} /> הגש מבחן
+                </button>
+              )}
+          </div>
+      </footer>
+
+      <Modal isOpen={!!modalContent} title={modalContent?.title} message={modalContent?.message} type={modalContent?.type} onClose={() => {
+          if (modalContent?.type === 'success') {
+              onLogout();
+          }
+          setModalContent(null);
+      }} />
+    </div>
+  );
+}
+
+// --- פרק 1: הבנת הנקרא ---
+function Part1({ answers, updateAnswer }) {
+  return (
+    <div className="flex flex-col md:flex-row h-full">
+        {/* צד ימין - טקסט (Sticky) */}
+        <div className="w-full md:w-5/12 h-[40vh] md:h-full bg-white border-l border-slate-200 overflow-y-auto selectable-text cursor-text relative shadow-[inset_-10px_0_20px_-20px_rgba(0,0,0,0.1)]">
+            <div className="p-8 pb-20">
+                <h2 className="text-2xl font-bold text-slate-800 mb-6 border-b pb-4 sticky top-0 bg-white/95 backdrop-blur-sm z-10">
+                    פרק א' – הבנת הנקרא (50 נקודות)
+                </h2>
+                <h3 className="text-xl font-bold text-slate-700 mb-4 text-center">החיים בעיר המודרנית – בין איכות חיים להסלמה</h3>
+                <div className="space-y-6 text-slate-700 leading-loose text-lg">
+                    {EXAM_TEXT.map((para, idx) => (
+                        <div key={para.id} className="relative pl-4">
+                            <span className="absolute right-0 font-bold text-blue-300 select-none text-sm -mr-6">פסקה {para.id === 'A'?'א':para.id === 'B'?'ב':para.id === 'C'?'ג':para.id === 'D'?'ד':para.id === 'E'?'ה':'ו'}</span>
+                            <p>{para.text}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        {/* צד שמאל - שאלות (Scrollable) */}
+        <div className="w-full md:w-7/12 h-full overflow-y-auto bg-slate-50 p-6 md:p-8">
+            <div className="max-w-3xl mx-auto space-y-10 pb-20">
+                
+                <div className="bg-blue-50 text-blue-800 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
+                    <AlertTriangle className="shrink-0 mt-1" size={20} />
+                    <p className="text-sm">ניתן לסמן ולהעתיק מילים מתוך הטקסט, או לגרור אותן ישירות לתוך תיבות הטקסט (Drag & Drop) כדי לענות.</p>
+                </div>
+
+                {/* שאלה 1 */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h4 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">1</span> א. על פי פסקה א, מהי אחת הטענות המרכזיות של המחבר לגבי האופן שבו מתוכננות ערים מודרניות? (10 נקודות)</h4>
+                    <RadioGroup 
+                        name="q1a" 
+                        value={answers.q1a} 
+                        onChange={val => updateAnswer('q1a', val)}
+                        options={[
+                            "הערים המודרניות מצליחות ליצור מגוון רחב של סגנונות חיים שונים.",
+                            "הערים המודרניות יוצרות לעיתים אחידות חיצונית, בלי התאמה מספקת לצרכים המקומיים.",
+                            "הרשויות המקומיות אינן אחראיות כלל על תכנון הרחובות והשכונות.",
+                            "תושבי הערים מעדיפים לחיות במקומות שקטים ומנותקים מתעשייה."
+                        ]}
+                    />
+
+                    <h4 className="font-bold text-lg mb-4 mt-8 flex gap-2">ב. על פי פסקה ב, מה עלול להוביל לירידה בחוסן הנפשי של התושבים? (10 נקודות)</h4>
+                    <RadioGroup 
+                        name="q1b" 
+                        value={answers.q1b} 
+                        onChange={val => updateAnswer('q1b', val)}
+                        options={[
+                            "מגורים בשכונות שקטות מדי, ללא אירועי תרבות.",
+                            "חיים בסביבה רועשת ומזוהמת, עם בעיות חוזרות שלא מקבלות פתרון.",
+                            "שימוש מוגבר ברשתות החברתיות בזמן שעות המנוחה.",
+                            "אכיפה קפדנית של תקנות העירייה."
+                        ]}
+                    />
+                </div>
+
+                {/* שאלה 2 */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h4 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">2</span> א. על פי פסקה ג, ציינו: (10 נקודות)</h4>
+                    <div className="space-y-4 pr-10">
+                        <div>
+                            <label className="block text-slate-700 mb-2">- שתי תקנות שהרשות המקומית יכולה לקבוע כדי לשפר את איכות החיים של התושבים:</label>
+                            <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[80px]" value={answers.q2a_1 || ''} onChange={e => updateAnswer('q2a_1', e.target.value)}></textarea>
+                        </div>
+                        <div>
+                            <label className="block text-slate-700 mb-2">- טענה אחת של חלק מן התושבים לגבי יישום התקנות בפועל:</label>
+                            <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[80px]" value={answers.q2a_2 || ''} onChange={e => updateAnswer('q2a_2', e.target.value)}></textarea>
+                        </div>
+                    </div>
+
+                    <h4 className="font-bold text-lg mb-4 mt-8 flex gap-2">ב. על פי פסקה ד, תארו בקצרה את מדיניות האכיפה ההדרגתית המתוארת במאמר. (10 נקודות)</h4>
+                    <p className="text-slate-600 mb-2 pr-10 text-sm">הסבירו מהו סדר הצעדים שנוקטים כלפי מי שמפר את התקנות שוב ושוב.</p>
+                    <div className="pr-10">
+                        <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[100px]" value={answers.q2b || ''} onChange={e => updateAnswer('q2b', e.target.value)}></textarea>
+                    </div>
+                </div>
+
+                {/* שאלה 3 */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h4 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">3</span> א. על פי פסקה ה, מה יכולה להיות גם תועלת חיובית בפרסום סרטונים ברשתות החברתיות, אף על פי שהם עלולים ליצור תחושה של הקצנה? (10 נקודות)</h4>
+                    <div className="pr-10">
+                        <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[100px]" value={answers.q3a || ''} onChange={e => updateAnswer('q3a', e.target.value)}></textarea>
+                    </div>
+
+                    <h4 className="font-bold text-lg mb-4 mt-8 flex gap-2">ב. על פי המאמר כולו, מהי לדעתך עמדת הכותב כלפי שימוש בשפה חריפה בדיון הציבורי על העיר? (10 נקודות)</h4>
+                    <p className="text-slate-600 mb-2 pr-10 text-sm">האם הכותב תומך בכך, מתנגד לכך, או מציע עמדה מורכבת יותר? נמקו את תשובתכם.</p>
+                    <div className="pr-10">
+                        <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[120px]" value={answers.q3b || ''} onChange={e => updateAnswer('q3b', e.target.value)}></textarea>
+                    </div>
+                </div>
+
+                {/* שאלה 4 */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h4 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">4</span> א. על פי המאמר כולו, מהי המטרה העיקרית של המאמר? (10 נקודות)</h4>
+                    <RadioGroup 
+                        name="q4a" 
+                        value={answers.q4a} 
+                        onChange={val => updateAnswer('q4a', val)}
+                        options={[
+                            "לשכנע את הקוראים לעבור לגור בכפר במקום בעיר.",
+                            "לתאר את מנגנוני האכיפה המשפטית במדינה.",
+                            "לדון במתח שבין רצון לאיכות חיים לבין הסכנה של הסלמה והקצנה בשיח ובאכיפה בעיר המודרנית.",
+                            "להציג נתונים סטטיסטיים על מצב הדיכאון בקרב צעירים."
+                        ]}
+                    />
+
+                    <h4 className="font-bold text-lg mb-4 mt-8 flex gap-2">ב. בפסקה א כתוב: "...רָשׁוּת מְקוֹמִית אחת או כמה רשויות, שלכל אחת מהן תקציב, סדרי עדיפויות ויכולת אכיפה משלה..."</h4>
+                    <p className="text-slate-700 mb-2 pr-10 font-medium">מהי הכוונה במילה "משלה" במשפט זה?</p>
+                    <div className="pr-10">
+                        <input type="text" className="w-full border-slate-300 border-b-2 bg-slate-50 p-2 focus:border-blue-500 outline-none" value={answers.q4b || ''} onChange={e => updateAnswer('q4b', e.target.value)} />
+                    </div>
+                </div>
+
+                {/* שאלה 5 */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h4 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">5</span> בחרו שלוש מילים מן הרשימה, כתבו פירוש בעברית ומשפט חדש משלכם. (10 נקודות)</h4>
+                    <p className="text-slate-600 mb-4 pr-10">המילים לבחירה: מיפגע, הסלמה, חוסן נפשי, דעה קדומה, תקנות, מודעות</p>
+                    
+                    <div className="pr-10 space-y-6">
+                        {[1, 2, 3].map(num => (
+                            <div key={num} className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div className="flex flex-col md:flex-row gap-4 mb-3">
+                                    <div className="w-full md:w-1/3">
+                                        <label className="text-xs text-slate-500 block mb-1">מילה {num}:</label>
+                                        <select className="w-full p-2 border rounded-lg bg-white outline-none" value={answers[`q5_word_${num}`] || ''} onChange={e => updateAnswer(`q5_word_${num}`, e.target.value)}>
+                                            <option value="">בחר מילה...</option>
+                                            <option value="מיפגע">מיפגע</option>
+                                            <option value="הסלמה">הסלמה</option>
+                                            <option value="חוסן נפשי">חוסן נפשי</option>
+                                            <option value="דעה קדומה">דעה קדומה</option>
+                                            <option value="תקנות">תקנות</option>
+                                            <option value="מודעות">מודעות</option>
+                                        </select>
+                                    </div>
+                                    <div className="w-full md:w-2/3">
+                                        <label className="text-xs text-slate-500 block mb-1">פירוש:</label>
+                                        <input type="text" className="w-full p-2 border rounded-lg outline-none focus:ring-1 focus:ring-blue-500" value={answers[`q5_meaning_${num}`] || ''} onChange={e => updateAnswer(`q5_meaning_${num}`, e.target.value)} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-slate-500 block mb-1">משפט:</label>
+                                    <input type="text" className="w-full p-2 border rounded-lg outline-none focus:ring-1 focus:ring-blue-500" value={answers[`q5_sentence_${num}`] || ''} onChange={e => updateAnswer(`q5_sentence_${num}`, e.target.value)} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* שאלה 6 */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h4 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">6</span> קראו את הקטע הבא וענו על השאלות שאחריו:</h4>
+                    <div className="bg-amber-50 border-r-4 border-amber-400 p-4 rounded-l-lg mb-6 text-slate-700 selectable-text">
+                        {ADDED_TEXT}
+                    </div>
+
+                    <div className="space-y-6 pr-10">
+                        <div>
+                            <h5 className="font-medium text-slate-800 mb-2">א. על פי הקטע הנוסף ועל פי פסקה ג, הסבירו כיצד מסייעות התקנות והקנסות להתמודד עם בעיית הרעש בעיר. (10 נקודות)</h5>
+                            <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[100px]" value={answers.q6a || ''} onChange={e => updateAnswer('q6a', e.target.value)}></textarea>
+                        </div>
+                        <div>
+                            <h5 className="font-medium text-slate-800 mb-2">ב. על פי הקטע הנוסף ועל פי פסקה ב, הסבירו מדוע יכולים חלק מן התושבים לראות ברעש המתמשך גורם המסכן את החוסן הנפשי שלהם. (10 נקודות)</h5>
+                            <textarea className="w-full border-slate-300 border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y min-h-[100px]" value={answers.q6b || ''} onChange={e => updateAnswer('q6b', e.target.value)}></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+  );
+}
+
+// --- פרק 2: חיבור ---
+function Part2({ answers, updateAnswer }) {
+  const topics = [
+      { id: 'A', title: 'א. בחירת מקצוע לעתיד.', desc: 'לקראת סיום הלימודים בבית הספר התיכון, תלמידים רבים עומדים בפני בחירה משמעותית בחייהם - בחירת מקצוע לעתיד. ההתלבטות אינה פשוטה: האם לבחור מקצוע בתחום שמעניין אותי ויכול לגרום לי הנאה וסיפוק, האם לבחור מקצוע שמתאים לכישורים וליכולות שלי? האם לבחור מקצוע שיבטיח לי הכנסה כספית גבוהה, ביטחון כלכלי והזדמנויות לקידום? בחיבורכם הביעו את דעתכם בנושא. בחרו בשני שיקולים שנראים בעיניכם הכי חשובים, נמקו את בחירתכם והביאו דוגמאות.' },
+      { id: 'B', title: 'ב. התמכרות בני הנוער למשחקי מחשב.', desc: 'בימינו משחקי מחשב הם פעילות פופולארית בקרב בני נוער. יש להם השפעות חיוביות, אבל כאשר השימוש בהם הופך להתמכרות, הוא עלול לפגוע בבריאות, בלימודים ובחיי החברה. בחיבורכם פרטו שתי סיבות שבגללן בני הנוער מתמכרים למשחקים, והציעו דרכים שבאמצעותן ניתן להתמודד עם התופעה. הביאו דוגמאות לדבריכם.' },
+      { id: 'C', title: 'ג. אירוע מפחיד ועצוב שחוויתם.', desc: 'רוב בני האדם חווים בחייהם אירועים מפחידים ועצובים. בחיבורכם תארו אירוע שגרם לכם לחוות חרדה, עצב או שניהם גם יחד. ספרו על המחשבות והרגשות שחוויתם בתגובה לאירוע ועל הדרך שבה התמודדתם עם החוויה.' }
+  ];
+
+  return (
+    <div className="h-full overflow-y-auto p-6 md:p-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-slate-800 mb-2 border-b-2 border-blue-600 pb-2 inline-block">פרק שני – חיבור (25 נקודות)</h2>
+            <p className="text-slate-600 mb-8 mt-2 text-lg">ענו על שאלה 7 בלבד. בחרו נושא אחד (א, ב או ג). אורך החיבור: 10–15 שורות. הקפידו על ניסוח ברור, רצף רעיוני, דוגמאות מתאימות, לשון תקינה וסימני פיסוק.</p>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+                {topics.map(topic => (
+                    <div key={topic.id} 
+                         className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${answers.essayTopic === topic.id ? 'border-blue-600 bg-blue-50 shadow-md transform -translate-y-1' : 'border-slate-200 bg-white hover:border-blue-300'}`}
+                         onClick={() => updateAnswer('essayTopic', topic.id)}>
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${answers.essayTopic === topic.id ? 'border-blue-600' : 'border-slate-400'}`}>
+                                {answers.essayTopic === topic.id && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>}
+                            </div>
+                            <h3 className="font-bold text-slate-800">{topic.title}</h3>
+                        </div>
+                        <p className="text-sm text-slate-600 leading-relaxed">{topic.desc}</p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-8">
+                <div className="flex justify-between items-center mb-4">
+                    <label className="font-bold text-lg text-slate-800">
+                        {answers.essayTopic ? `כתיבת חיבור: ${topics.find(t=>t.id===answers.essayTopic).title}` : 'אנא בחרו נושא מן הרשימה למעלה כדי להתחיל'}
+                    </label>
+                    <span className="text-sm text-slate-400 bg-slate-100 px-3 py-1 rounded-full">10-15 שורות</span>
+                </div>
+                <textarea 
+                    className={`w-full border-2 rounded-xl p-6 text-lg leading-loose focus:ring-0 focus:border-blue-500 outline-none transition-colors min-h-[400px] resize-y ${!answers.essayTopic ? 'bg-slate-50 cursor-not-allowed border-slate-200' : 'bg-white border-slate-300'}`}
+                    placeholder={answers.essayTopic ? "התחילו לכתוב כאן..." : "בחרו נושא קודם..."}
+                    value={answers.essayText || ''}
+                    onChange={e => updateAnswer('essayText', e.target.value)}
+                    disabled={!answers.essayTopic}
+                ></textarea>
+                <div className="mt-2 text-left text-xs text-slate-400">
+                   תווים: {(answers.essayText || '').length} | מילים: {(answers.essayText || '').split(/\s+/).filter(w=>w.length>0).length}
+                </div>
+            </div>
+        </div>
+    </div>
+  );
+}
+
+// --- פרק 3: לשון ---
+function Part3({ answers, updateAnswer }) {
+  const q8Sentences = [
+      { id: 'a', text: 'רשויות רבות מַדְגִּישׁוֹת את חשיבות איכות החיים של התושבים.', word: 'מַדְגִּישׁוֹת', binyanFormat: 'הפעיל', testSentence: 'המורה __________ את הנקודה המרכזית בשיעור.' },
+      { id: 'b', text: 'לא פעם מִתְעוֹרְרוֹת מחלוקות בין תושבים לבין הרשות.', word: 'מִתְעוֹרְרוֹת', binyanFormat: 'פועל', testSentence: 'הרעש החזק __________ את התושבים בלילה.' },
+      { id: 'c', text: 'מחקרים מַצְבִּיעִים על כך שחיים בסביבה רועשת עלולים להזיק.', word: 'מַצְבִּיעִים', binyanFormat: 'הופעל', testSentence: 'במחקר זה __________ על קשר בין רעש לבריאות.' },
+      { id: 'd', text: 'הרשות המקומית קוֹבַעַת תקנות שונות.', word: 'קוֹבַעַת', binyanFormat: 'נפעל', testSentence: 'גובה הקנס _____________ אחרי בית המשפט בחודש הבא.' },
+      { id: 'e', text: 'בשנים האחרונות התושבים מִשְׁתַּמְּשִׁים בפלטפורמות מקוונות.', word: 'מִשְׁתַּמְּשִׁים', binyanFormat: 'פיעל', testSentence: 'הטכנולוגיה __________ את התושבים לצורך שיתוף מידע.' }
+  ];
+
+  return (
+    <div className="h-full overflow-y-auto p-6 md:p-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto space-y-12">
+            <div>
+                <h2 className="text-2xl font-bold text-slate-800 mb-2 border-b-2 border-blue-600 pb-2 inline-block">פרק שלישי – לשון (25 נקודות)</h2>
+                <p className="text-slate-600 mt-2">יש חמישה משפטים הבאים א-ה, ענו על כל הסעיפים (1)-(3). פעלים בבניינים פיעל, פועל, הופעל כתבו בכתיב מלא.</p>
+            </div>
+
+            {/* שאלה 8 */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 className="font-bold text-lg mb-6 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">8</span> נתחו את הפעלים במשפטים הבאים:</h3>
+                
+                <div className="space-y-8 pr-4">
+                    {q8Sentences.map((s, idx) => (
+                        <div key={s.id} className="border-b border-slate-100 pb-6 last:border-0 last:pb-0">
+                            <h4 className="font-medium text-slate-800 mb-3 bg-slate-50 p-2 rounded">{String.fromCharCode(1488 + idx)}. {s.text}</h4>
+                            <div className="grid md:grid-cols-2 gap-4 pr-4">
+                                <div>
+                                    <label className="text-sm text-slate-600 block mb-1">(1) השורש של הפועל "{s.word}" הוא:</label>
+                                    <input type="text" className="w-full border-slate-300 border-b-2 bg-slate-50 p-2 focus:border-blue-500 outline-none text-center tracking-widest" value={answers[`q8_${s.id}_root`] || ''} onChange={e => updateAnswer(`q8_${s.id}_root`, e.target.value)} placeholder="X-X-X" />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-slate-600 block mb-1">(2) הבניין של הפועל "{s.word}" הוא:</label>
+                                    <input type="text" className="w-full border-slate-300 border-b-2 bg-slate-50 p-2 focus:border-blue-500 outline-none" value={answers[`q8_${s.id}_binyan`] || ''} onChange={e => updateAnswer(`q8_${s.id}_binyan`, e.target.value)} />
+                                </div>
+                                <div className="md:col-span-2 mt-2">
+                                    <label className="text-sm text-slate-600 block mb-1">(3) השלימו פועל אחר מאותו שורש בבניין {s.binyanFormat}:</label>
+                                    <div className="flex items-center gap-2 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                                        <span className="text-slate-700">{s.testSentence.split('__________')[0]}</span>
+                                        <input type="text" className="w-32 border-b-2 border-blue-400 bg-transparent text-center font-bold text-blue-800 outline-none focus:border-blue-600" value={answers[`q8_${s.id}_fill`] || ''} onChange={e => updateAnswer(`q8_${s.id}_fill`, e.target.value)} />
+                                        <span className="text-slate-700">{s.testSentence.split('__________')[1]}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* שאלה 9 */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 className="font-bold text-lg mb-4 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">9</span> שם העצם ומבנה המילה (4 נקודות)</h3>
+                <div className="bg-slate-50 p-4 rounded-xl text-slate-700 mb-6 italic border-r-4 border-slate-300">
+                    "הרשות המקומית פרסמה <strong>אזהרה</strong> רשמית בעקבות <strong>הסלמה</strong> ברמת הרעש בשכונות מסוימות במיוחד שיש בהן <strong>אטרקציות</strong>. בהודעה הודגש כי <strong>התעלמות</strong> מן התקנות תיחשב הפרה חמורה, וכי יופעל <strong>מנגנון</strong> פיקוח חדש. הרשות ציינה כי כל תלונה תיבדק ברצינות, וכי המטרה איננה ענישה, אלא שיפור <strong>איכות</strong> החיים של התושבים."
+                </div>
+                <p className="mb-4 text-slate-700">מיינו את המילים המודגשות בטבלה לפי דרך התצורה:</p>
+                
+                <div className="overflow-x-auto">
+                    <table className="w-full text-right border-collapse">
+                        <thead>
+                            <tr className="bg-slate-100">
+                                <th className="border p-3 w-1/4">המילה</th>
+                                <th className="border p-3 w-1/4">שורש ומשקל</th>
+                                <th className="border p-3 w-1/4">בסיס וצורן</th>
+                                <th className="border p-3 w-1/4">שאילה מלעז</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {['אזהרה', 'הסלמה', 'אטרקציות', 'התעלמות', 'מנגנון', 'איכות'].map(word => (
+                                <tr key={word} className="hover:bg-slate-50">
+                                    <td className="border p-3 font-medium bg-slate-50">{word}</td>
+                                    <td className="border p-0">
+                                        <label className="flex items-center justify-center w-full h-full p-3 cursor-pointer">
+                                            <input type="radio" name={`q9_${word}`} className="w-5 h-5 text-blue-600" checked={answers[`q9_${word}`] === 'שורש_ומשקל'} onChange={() => updateAnswer(`q9_${word}`, 'שורש_ומשקל')} />
+                                        </label>
+                                    </td>
+                                    <td className="border p-0">
+                                        <label className="flex items-center justify-center w-full h-full p-3 cursor-pointer">
+                                            <input type="radio" name={`q9_${word}`} className="w-5 h-5 text-blue-600" checked={answers[`q9_${word}`] === 'בסיס_וצורן'} onChange={() => updateAnswer(`q9_${word}`, 'בסיס_וצורן')} />
+                                        </label>
+                                    </td>
+                                    <td className="border p-0">
+                                        <label className="flex items-center justify-center w-full h-full p-3 cursor-pointer">
+                                            <input type="radio" name={`q9_${word}`} className="w-5 h-5 text-blue-600" checked={answers[`q9_${word}`] === 'שאילה'} onChange={() => updateAnswer(`q9_${word}`, 'שאילה')} />
+                                        </label>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* שאלה 10 */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 className="font-bold text-lg mb-2 flex gap-2"><span className="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full shrink-0">10</span> מילות קישור במשפטים (6 נקודות)</h3>
+                <p className="text-slate-600 mb-6">ענו על שניים מן הסעיפים א–ג. (3 נקודות לכל סעיף)</p>
+
+                <div className="space-y-8 pr-4">
+                    <div>
+                        <h4 className="font-medium text-slate-800 mb-3">א. בחרו את מילת הקישור המתאימה:</h4>
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <p className="mb-4">חלק מן התושבים מרגישים שהעיר מספקת להם תנאים טובים, ______________ אחרים טוענים שהרעש והזיהום בלתי נסבלים.</p>
+                            <div className="flex flex-wrap gap-4">
+                                {['אבל', 'מכיוון ש', 'לכן', 'כדי ש'].map(opt => (
+                                    <label key={opt} className={`px-4 py-2 border rounded-full cursor-pointer transition-colors ${answers.q10a === opt ? 'bg-blue-600 text-white border-blue-600' : 'bg-white hover:bg-slate-100 border-slate-300'}`}>
+                                        <input type="radio" className="hidden" name="q10a" checked={answers.q10a === opt} onChange={() => updateAnswer('q10a', opt)} />
+                                        {opt}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className="font-medium text-slate-800 mb-3">ב. בחרו את מילת הקישור המתאימה:</h4>
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <p className="mb-4">הרשות המקומית הגבילה את שעות פעילות המפעלים, _______________ להפחית את רמת הרעש בשכונות המגורים.</p>
+                            <div className="flex flex-wrap gap-4">
+                                {['אף על פי ש', 'כדי', 'למרות', 'או'].map(opt => (
+                                    <label key={opt} className={`px-4 py-2 border rounded-full cursor-pointer transition-colors ${answers.q10b === opt ? 'bg-blue-600 text-white border-blue-600' : 'bg-white hover:bg-slate-100 border-slate-300'}`}>
+                                        <input type="radio" className="hidden" name="q10b" checked={answers.q10b === opt} onChange={() => updateAnswer('q10b', opt)} />
+                                        {opt}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className="font-medium text-slate-800 mb-3">ג. החליפו את מילת הקישור "אבל" באחרת, בלי לשנות את המשמעות:</h4>
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <p className="mb-4">התושבים ביקשו מהרשות לפעול במהירות, <strong className="underline decoration-2">אבל</strong> הם המשיכו לסבול מן המיפגעים עוד חודשים רבים.</p>
+                            <div className="flex flex-wrap gap-4">
+                                {['למרות זאת', 'משום כך', 'כדי ש', 'או'].map(opt => (
+                                    <label key={opt} className={`px-4 py-2 border rounded-full cursor-pointer transition-colors ${answers.q10c === opt ? 'bg-blue-600 text-white border-blue-600' : 'bg-white hover:bg-slate-100 border-slate-300'}`}>
+                                        <input type="radio" className="hidden" name="q10c" checked={answers.q10c === opt} onChange={() => updateAnswer('q10c', opt)} />
+                                        {opt}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div className="text-center mt-12 pb-8">
+                <p className="text-xl font-bold text-blue-600">בהצלחה 😊</p>
+            </div>
+        </div>
+    </div>
+  );
+}
+
+// --- מסך סיכום ---
+function SummaryScreen({ answers, onSubmit }) {
+    
+    const isAnswered = (val) => {
+        if (typeof val === 'string') return val.trim().length > 0;
+        if (typeof val === 'boolean') return true;
+        if (Array.isArray(val)) return val.length > 0;
+        return !!val;
+    };
+
+    const statusObj = {
+        'פרק א - שאלות סגורות (1, 4א)': isAnswered(answers.q1a) && isAnswered(answers.q1b) && isAnswered(answers.q4a),
+        'פרק א - שאלות פתוחות (2, 3, 4ב, 6)': isAnswered(answers.q2a_1) && isAnswered(answers.q2b) && isAnswered(answers.q6a),
+        'פרק א - אוצר מילים (5)': isAnswered(answers.q5_word_1) && isAnswered(answers.q5_meaning_1),
+        'פרק ב - בחירת נושא לחיבור': !!answers.essayTopic,
+        'פרק ב - כתיבת חיבור': isAnswered(answers.essayText) && answers.essayText.length > 50,
+        'פרק ג - ניתוח פעלים (8)': isAnswered(answers.q8_a_root) && isAnswered(answers.q8_b_root),
+        'פרק ג - תצורת מילה (9)': isAnswered(answers.q9_אזהרה) && isAnswered(answers.q9_אטרקציות),
+        'פרק ג - מילות קישור (10)': (isAnswered(answers.q10a) ? 1 : 0) + (isAnswered(answers.q10b) ? 1 : 0) + (isAnswered(answers.q10c) ? 1 : 0) >= 2
+    };
+
+    const totalSections = Object.keys(statusObj).length;
+    const completedSections = Object.values(statusObj).filter(Boolean).length;
+
+    return (
+        <div className="h-full overflow-y-auto p-6 flex items-center justify-center bg-slate-50">
+            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl w-full text-center border border-slate-200">
+                <h2 className="text-3xl font-bold text-slate-800 mb-6">סיכום לפני הגשה</h2>
+                
+                <div className="mb-8">
+                    <div className="w-32 h-32 mx-auto relative mb-4">
+                        <svg viewBox="0 0 36 36" className="w-full h-full stroke-current text-slate-200">
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="3" />
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="3" strokeDasharray={`${(completedSections/totalSections)*100}, 100`} className={`${completedSections === totalSections ? 'text-green-500' : 'text-blue-500'}`} />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center flex-col">
+                            <span className="text-3xl font-bold">{Math.round((completedSections/totalSections)*100)}%</span>
+                        </div>
+                    </div>
+                    <p className="text-slate-600">ענית על {completedSections} מתוך {totalSections} חלקי המבחן</p>
+                </div>
+
+                <div className="text-right bg-slate-50 p-6 rounded-xl border mb-8 space-y-3">
+                    {Object.entries(statusObj).map(([key, isDone]) => (
+                        <div key={key} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                            <span className="text-slate-700">{key}</span>
+                            {isDone ? 
+                                <span className="text-green-600 bg-green-100 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><CheckCircle size={14}/> נענה</span> : 
+                                <span className="text-amber-600 bg-amber-100 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><AlertTriangle size={14}/> דורש השלמה</span>
+                            }
+                        </div>
+                    ))}
+                </div>
+
+                {completedSections < totalSections && (
+                    <div className="bg-amber-50 text-amber-800 p-4 rounded-lg mb-8 flex gap-3 text-right">
+                        <AlertTriangle className="shrink-0" />
+                        <p className="text-sm">שים לב: לא השלמת את כל חלקי המבחן. תוכל לחזור אחורה ולהשלים, או להגיש את המבחן כפי שהוא כעת.</p>
+                    </div>
+                )}
+
+                <button onClick={onSubmit} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-md transition-transform hover:scale-[1.02] flex justify-center items-center gap-2 text-lg">
+                    <CheckCircle /> הגש מבחן סופית
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// --- רכיבי עזר ---
+const RadioGroup = ({ name, options, value, onChange }) => (
+    <div className="space-y-3 pr-10">
+        {options.map((opt, idx) => (
+            <label key={idx} className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${value === opt ? 'bg-blue-50 border-blue-500 shadow-sm' : 'hover:bg-slate-50 border-slate-200'}`}>
+                <input type="radio" name={name} value={opt} checked={value === opt} onChange={() => onChange(opt)} className="mt-1 w-5 h-5 text-blue-600" />
+                <span className="text-slate-700 text-lg leading-relaxed">{opt}</span>
+            </label>
+        ))}
+    </div>
+);
+
+
+// ==========================================
+// ========== ממשק מורה (Teacher) ===========
+// ==========================================
+
+function TeacherApp({ user, onLogout, submissions, setSubmissions }) {
+    const [view, setView] = useState('dashboard'); // dashboard, grading
+    const [selectedSub, setSelectedSub] = useState(null);
+
+    const calcAvg = () => {
+        const graded = submissions.filter(s => s.graded);
+        if(!graded.length) return 0;
+        return Math.round(graded.reduce((acc, s) => acc + s.finalScore, 0) / graded.length);
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-50 font-sans" dir="rtl">
+            <header className="bg-blue-800 text-white shadow-md px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+                <div className="flex items-center gap-4">
+                    <div className="bg-white/20 p-2 rounded-lg"><User size={24} /></div>
+                    <div>
+                        <h1 className="font-bold text-lg">פאנל ניהול ובדיקה - צוות הוראה</h1>
+                        <p className="text-blue-200 text-sm">מוסד: {user.orgCode}</p>
+                    </div>
+                </div>
+                <div className="flex gap-4">
+                    {view === 'grading' && (
+                        <button onClick={() => setView('dashboard')} className="px-4 py-2 bg-blue-700 hover:bg-blue-600 rounded-lg transition-colors flex items-center gap-2">
+                            <ChevronRight size={18} /> חזור לרשימה
+                        </button>
+                    )}
+                    <button onClick={onLogout} className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg transition-colors flex items-center gap-2">
+                        <LogOut size={18} /> התנתק
+                    </button>
+                </div>
+            </header>
+
+            <main className="p-6 max-w-7xl mx-auto">
+                {view === 'dashboard' ? (
+                    <TeacherDashboard submissions={submissions} onSelect={(s) => { setSelectedSub(s); setView('grading'); }} avg={calcAvg()} />
+                ) : (
+                    <GradingView 
+                        submission={selectedSub} 
+                        onSave={(gradedSub) => {
+                            setSubmissions(prev => prev.map(s => s.student.id === gradedSub.student.id ? gradedSub : s));
+                            setView('dashboard');
+                        }} 
+                    />
+                )}
+            </main>
+        </div>
+    );
+}
+
+function TeacherDashboard({ submissions, onSelect, avg }) {
+    
+    const getScoreColor = (score) => {
+        if(score >= 81) return 'bg-green-100 text-green-800 border-green-200';
+        if(score >= 61) return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-red-100 text-red-800 border-red-200';
+    };
+
+    const downloadCsv = () => {
+        const headers = ['ת"ז', 'שם', 'סטטוס', 'ציון'];
+        const rows = submissions.map(s => [s.student.id, s.student.name, s.graded ? 'נבדק' : 'ממתין', s.graded ? s.finalScore : '-']);
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "ציונים.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="grid md:grid-cols-4 gap-4">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div className="bg-blue-100 p-4 rounded-full text-blue-600"><FileText size={24}/></div>
+                    <div>
+                        <p className="text-sm text-slate-500">הגשות סה"כ</p>
+                        <p className="text-2xl font-bold">{submissions.length}</p>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div className="bg-amber-100 p-4 rounded-full text-amber-600"><Clock size={24}/></div>
+                    <div>
+                        <p className="text-sm text-slate-500">ממתינים לבדיקה</p>
+                        <p className="text-2xl font-bold">{submissions.filter(s=>!s.graded).length}</p>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div className="bg-green-100 p-4 rounded-full text-green-600"><CheckCircle size={24}/></div>
+                    <div>
+                        <p className="text-sm text-slate-500">נבדקו</p>
+                        <p className="text-2xl font-bold">{submissions.filter(s=>s.graded).length}</p>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div className="bg-purple-100 p-4 rounded-full text-purple-600"><BarChart size={24}/></div>
+                    <div>
+                        <p className="text-sm text-slate-500">ממוצע כיתתי</p>
+                        <p className="text-2xl font-bold">{avg}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-4 border-b flex justify-between items-center bg-slate-50">
+                    <h2 className="font-bold text-lg text-slate-800">רשימת תלמידים</h2>
+                    <button onClick={downloadCsv} className="flex items-center gap-2 text-sm bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700 transition">
+                        <Download size={16}/> ייצא לאקסל
+                    </button>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-right">
+                        <thead>
+                            <tr className="bg-slate-100 text-slate-600 text-sm">
+                                <th className="p-4 font-medium">ת"ז</th>
+                                <th className="p-4 font-medium">שם תלמיד/ה</th>
+                                <th className="p-4 font-medium">מועד הגשה</th>
+                                <th className="p-4 font-medium">חריגות (רמאות)</th>
+                                <th className="p-4 font-medium">סטטוס</th>
+                                <th className="p-4 font-medium">ציון</th>
+                                <th className="p-4 font-medium">פעולה</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {submissions.length === 0 ? (
+                                <tr><td colSpan="7" className="p-8 text-center text-slate-500">אין מבחנים להצגה כרגע</td></tr>
+                            ) : submissions.map((sub, i) => (
+                                <tr key={i} className="hover:bg-slate-50 transition-colors">
+                                    <td className="p-4 font-mono text-sm">{sub.student.id}</td>
+                                    <td className="p-4 font-medium">{sub.student.name}</td>
+                                    <td className="p-4 text-sm text-slate-500">{new Date(sub.submittedAt).toLocaleTimeString('he-IL')}</td>
+                                    <td className="p-4">
+                                        {sub.cheatLogs?.length > 0 ? <span className="text-red-600 flex items-center gap-1 text-xs font-bold bg-red-50 px-2 py-1 rounded w-fit"><AlertTriangle size={12}/> {sub.cheatLogs.length} אירועים</span> : <span className="text-slate-400 text-sm">-</span>}
+                                    </td>
+                                    <td className="p-4">
+                                        <span className={`px-2 py-1 rounded text-xs font-bold ${sub.graded ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                            {sub.graded ? 'נבדק' : 'ממתין לבדיקה'}
+                                        </span>
+                                    </td>
+                                    <td className="p-4">
+                                        {sub.graded ? <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreColor(sub.finalScore)}`}>{sub.finalScore}</span> : '-'}
+                                    </td>
+                                    <td className="p-4">
+                                        <button onClick={() => onSelect(sub)} className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm">
+                                            {sub.graded ? 'צפה / ערוך' : 'בדוק עכשיו'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function GradingView({ submission, onSave }) {
+    // Local state for grading this specific submission
+    const [grades, setGrades] = useState(submission.grades || {});
+    const [comments, setComments] = useState(submission.comments || {});
+    const [penalty, setPenalty] = useState(submission.penalty || 0);
+
+    const calcTotal = () => {
+        const sum = Object.values(grades).reduce((acc, val) => acc + (Number(val) || 0), 0);
+        return Math.max(0, sum - Number(penalty));
+    };
+
+    const handleSave = () => {
+        onSave({
+            ...submission,
+            grades,
+            comments,
+            penalty,
+            finalScore: calcTotal(),
+            graded: true
+        });
+    };
+
+    const handleAIAssist = () => {
+        // Mock AI Grading behavior
+        const aiGrades = {};
+        const aiComments = {};
+        
+        // Auto-check closed questions
+        if(submission.answers.q1a === "הערים המודרניות יוצרות לעיתים אחידות חיצונית, בלי התאמה מספקת לצרכים המקומיים.") aiGrades.q1a = 10; else aiGrades.q1a = 0;
+        if(submission.answers.q1b === "חיים בסביבה רועשת ומזוהמת, עם בעיות חוזרות שלא מקבלות פתרון.") aiGrades.q1b = 10; else aiGrades.q1b = 0;
+        if(submission.answers.q4a === "לדון במתח שבין רצון לאיכות חיים לבין הסכנה של הסלמה והקצנה בשיח ובאכיפה בעיר המודרנית.") aiGrades.q4a = 10; else aiGrades.q4a = 0;
+        
+        // Mock score for long text based on length
+        if((submission.answers.essayText||'').length > 100) { aiGrades.essay = 22; aiComments.essay = '🤖 AI: כתיבה רציפה, יש לבדוק דקדוק ידנית.'; }
+        
+        setGrades(prev => ({...prev, ...aiGrades}));
+        setComments(prev => ({...prev, ...aiComments}));
+        alert('הצעות AI הוזנו. אנא עבור ואשר ידנית.'); // Simple native alert is OK for this mock internal action
+    };
+
+    return (
+        <div className="flex flex-col md:flex-row gap-6">
+            {/* צד ימין - התשובות של התלמיד */}
+            <div className="w-full md:w-2/3 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-[85vh] overflow-y-auto">
+                <div className="bg-slate-800 text-white p-4 sticky top-0 z-10 flex justify-between items-center">
+                    <h2 className="font-bold">תשובות התלמיד: {submission.student.name}</h2>
+                    <span className="text-slate-300 font-mono text-sm">{submission.student.id}</span>
+                </div>
+                
+                {submission.cheatLogs?.length > 0 && (
+                    <div className="bg-red-50 p-4 border-b border-red-100">
+                        <h3 className="font-bold text-red-700 flex items-center gap-2 mb-2"><AlertTriangle size={18}/> התראות מערכת (חריגות)</h3>
+                        <ul className="list-disc pr-6 text-sm text-red-600">
+                            {submission.cheatLogs.map((log, i) => (
+                                <li key={i}>{new Date(log.time).toLocaleTimeString()} - {log.action}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                <div className="p-6 space-y-8">
+                    {/* Render answers in a read-only way */}
+                    <Section title="פרק א' - הבנת הנקרא">
+                        <AnswerDisplay q="1.א טענה מרכזית" ans={submission.answers.q1a} />
+                        <AnswerDisplay q="1.ב ירידה בחוסן הנפשי" ans={submission.answers.q1b} />
+                        <AnswerDisplay q="2.א.1 תקנות לשיפור" ans={submission.answers.q2a_1} />
+                        <AnswerDisplay q="2.א.2 טענות תושבים" ans={submission.answers.q2a_2} />
+                        <AnswerDisplay q="2.ב מדיניות הדרגתית" ans={submission.answers.q2b} />
+                        <AnswerDisplay q="3.א סרטונים ברשתות" ans={submission.answers.q3a} />
+                        <AnswerDisplay q="3.ב עמדת הכותב" ans={submission.answers.q3b} />
+                        <AnswerDisplay q="4.א המטרה העיקרית" ans={submission.answers.q4a} />
+                        <AnswerDisplay q="4.ב משמעות 'משלה'" ans={submission.answers.q4b} />
+                        <AnswerDisplay q="6.א תקנות וקנסות" ans={submission.answers.q6a} />
+                        <AnswerDisplay q="6.ב חוסן נפשי (רעש מתמשך)" ans={submission.answers.q6b} />
+                    </Section>
+
+                    <Section title="פרק ב' - חיבור">
+                        <p className="font-bold text-slate-700 mb-2">נושא נבחר: {submission.answers.essayTopic}</p>
+                        <div className="bg-slate-50 border p-4 rounded-lg whitespace-pre-wrap leading-loose min-h-[200px]">
+                            {submission.answers.essayText || '- אין תשובה -'}
+                        </div>
+                    </Section>
+
+                    <Section title="פרק ג' - לשון">
+                        {['a','b','c','d','e'].map(id => (
+                            <div key={id} className="mb-4 bg-slate-50 p-3 rounded border">
+                                <p className="font-bold mb-2">משפט {id.toUpperCase()}:</p>
+                                <p className="text-sm text-slate-600">שורש: {submission.answers[`q8_${id}_root`] || '-'}</p>
+                                <p className="text-sm text-slate-600">בניין: {submission.answers[`q8_${id}_binyan`] || '-'}</p>
+                                <p className="text-sm text-slate-600">השלמה: {submission.answers[`q8_${id}_fill`] || '-'}</p>
+                            </div>
+                        ))}
+                    </Section>
+                </div>
+            </div>
+
+            {/* צד שמאל - טופס מתן ציונים */}
+            <div className="w-full md:w-1/3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[85vh]">
+                <div className="bg-blue-50 p-4 border-b border-blue-100 flex justify-between items-center shrink-0">
+                    <h2 className="font-bold text-blue-900 text-xl">פאנל בדיקה</h2>
+                    <div className="text-2xl font-black text-blue-700 bg-white px-4 py-1 rounded-full shadow-sm">
+                        {calcTotal()} <span className="text-sm font-normal text-slate-500">/ 100</span>
+                    </div>
+                </div>
+                
+                <div className="p-4 bg-white border-b shrink-0 flex gap-2">
+                     <button onClick={handleAIAssist} className="flex-1 bg-purple-100 text-purple-700 hover:bg-purple-200 py-2 rounded-lg font-medium flex justify-center items-center gap-2 transition">
+                         <Bot size={18}/> הצעת ציון AI
+                     </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    <GradeBox id="q1a" max={10} label="שאלה 1א (10 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <GradeBox id="q1b" max={10} label="שאלה 1ב (10 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <GradeBox id="q2" max={20} label="שאלה 2 (20 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <GradeBox id="q3" max={20} label="שאלה 3 (20 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <GradeBox id="q4" max={10} label="שאלה 4 (10 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <GradeBox id="q5" max={10} label="שאלה 5 מילים (10 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <GradeBox id="q6" max={20} label="שאלה 6 (20 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <div className="border-t my-4"></div>
+                    <GradeBox id="essay" max={25} label="פרק ב' - חיבור (25 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    <div className="border-t my-4"></div>
+                    <GradeBox id="lashon" max={25} label="פרק ג' - לשון (25 נק')" grades={grades} setGrades={setGrades} comments={comments} setComments={setComments} />
+                    
+                    <div className="bg-red-50 p-4 rounded-xl border border-red-100 mt-6">
+                        <label className="font-bold text-red-800 block mb-2">הפחתת נקודות (קנס):</label>
+                        <input type="number" min="0" max="100" className="w-full border p-2 rounded outline-none" value={penalty} onChange={e => setPenalty(e.target.value)} placeholder="0" />
+                    </div>
+                </div>
+
+                <div className="p-4 bg-slate-50 border-t shrink-0">
+                    <button onClick={handleSave} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2">
+                        <Save size={20}/> שמור ציון סופי
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const Section = ({ title, children }) => (
+    <div className="mb-8">
+        <h3 className="text-xl font-bold text-slate-800 border-b pb-2 mb-4">{title}</h3>
+        <div className="space-y-4">{children}</div>
+    </div>
+);
+
+const AnswerDisplay = ({ q, ans }) => (
+    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+        <p className="font-bold text-slate-700 mb-2">{q}</p>
+        <p className="text-slate-800 whitespace-pre-wrap">{ans || <span className="text-slate-400 italic">לא נענה</span>}</p>
+    </div>
+);
+
+const GradeBox = ({ id, max, label, grades, setGrades, comments, setComments }) => (
+    <div className="bg-white p-4 rounded-xl border shadow-sm">
+        <div className="flex justify-between items-center mb-2">
+            <label className="font-bold text-slate-700">{label}</label>
+            <input type="number" min="0" max={max} className="w-16 border-2 border-blue-200 bg-blue-50 text-center font-bold p-1 rounded outline-none focus:border-blue-500" value={grades[id] !== undefined ? grades[id] : ''} onChange={e => setGrades(prev => ({...prev, [id]: Number(e.target.value)}))} placeholder="0" />
+        </div>
+        <textarea className="w-full text-sm border p-2 rounded bg-slate-50 outline-none" placeholder="הערות מורה (אופציונלי)..." value={comments[id] || ''} onChange={e => setComments(prev => ({...prev, [id]: e.target.value}))} rows="1"></textarea>
+    </div>
+);
